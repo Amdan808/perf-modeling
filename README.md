@@ -152,5 +152,4 @@ npm run generate:api
 
 ## Known notes
 
-- Frontend production build may emit a chunk-size warning; this is non-blocking and can be optimized later with code-splitting.
-
+- Frontend build is now split into `react`, `charts`, and `vendor` chunks via `web/vite.config.ts` to keep initial app payload smaller.
