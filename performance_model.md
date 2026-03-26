@@ -1,11 +1,11 @@
-# Performance Under Pressure — Mathematical Model
-*Compiled from conversation session, March 25 2026*
+# Stress Activation — Mathematical Model Of Human Performance Under Pressure
 
 ---
 
 ## Origin & Intent
 
-The model formalizes a self-observed pattern: performance output is higher and more reliable under high-stakes, time-pressured conditions. The goal is to eventually derive practical interventions — ways to engineer the conditions that produce peak output earlier in a timeline, without waiting for natural deadline pressure.
+The model formalizes a self-observed pattern: performance output is higher and more reliable under high-stakes, time-pressured conditions. 
+**The goal:** to eventually derive practical interventions — ways to engineer the conditions that produce peak output earlier in a timeline.
 
 ---
 
@@ -39,7 +39,8 @@ S = C_eff / (t_f - t_n + δ)
 C_eff = C · ψ
 ```
 
-S is the instantaneous stress load. It grows as the deadline approaches. δ is a small stability constant preventing division by zero at t_n = t_f. C_eff is effective stakes — the real consequence C scaled by ψ, the degree to which the consequence is psychologically perceived as real.
+S is the instantaneous stress load. It grows as the deadline approaches. δ is a small stability constant preventing division by zero at t_n = t_f.
+C_eff is effective stakes — the real consequence C scaled by ψ, the degree to which the consequence is psychologically perceived as real.
 
 ---
 
@@ -190,7 +191,7 @@ The exact functional form of ψ = f(p, ρ, ι) is **open / not yet specified.**
 
 ## Self-Calibrated Parameters (from observed data)
 
-Based on the user's self-assessment screenshot (α=2.8, β=0.15, A=2.4, λ=0.60, C=4.2):
+(α=2.8, β=0.15, A=2.4, λ=0.60, C=4.2):
 
 - **S* = α/β ≈ 18.67** — unusually high optimal stress threshold
 - **α = 2.8** — steep activation ramp, ignites fast once stress builds
@@ -200,4 +201,4 @@ Based on the user's self-assessment screenshot (α=2.8, β=0.15, A=2.4, λ=0.60,
 
 ---
 
-*End of compiled session. Continue in Claude Code.*
+
