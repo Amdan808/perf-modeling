@@ -1,0 +1,1173 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Performance Under Pressure API",
+    "description": "Executable model backend with feedback closure, calibration, and sensitivity analysis.",
+    "version": "0.1.0"
+  },
+  "paths": {
+    "/health": {
+      "get": {
+        "summary": "Health",
+        "operationId": "health_health_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "type": "object",
+                  "title": "Response Health Health Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/parameter-governance": {
+      "get": {
+        "summary": "Parameter Governance",
+        "operationId": "parameter_governance_parameter_governance_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ParameterGovernanceResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/simulate": {
+      "post": {
+        "summary": "Simulate",
+        "operationId": "simulate_simulate_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SimulateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SimulationResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/evaluate": {
+      "post": {
+        "summary": "Evaluate",
+        "operationId": "evaluate_evaluate_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EvaluateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EvaluateResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/calibrate": {
+      "post": {
+        "summary": "Calibrate Endpoint",
+        "operationId": "calibrate_endpoint_calibrate_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CalibrationRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CalibrationResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/sensitivity": {
+      "post": {
+        "summary": "Sensitivity Endpoint",
+        "operationId": "sensitivity_endpoint_sensitivity_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SensitivityRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SensitivityResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/compare-interventions": {
+      "post": {
+        "summary": "Compare Endpoint",
+        "operationId": "compare_endpoint_compare_interventions_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CompareRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CompareResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "CalibrationRequest": {
+        "properties": {
+          "scenario": {
+            "$ref": "#/components/schemas/ModelScenario"
+          },
+          "observations": {
+            "items": {
+              "$ref": "#/components/schemas/ObservationPoint"
+            },
+            "type": "array",
+            "minItems": 6,
+            "title": "Observations"
+          },
+          "fit_parameters": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Fit Parameters"
+          },
+          "initial_guess": {
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "type": "number"
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Initial Guess"
+          },
+          "max_nfev": {
+            "type": "integer",
+            "maximum": 5000.0,
+            "minimum": 20.0,
+            "title": "Max Nfev",
+            "default": 300
+          }
+        },
+        "type": "object",
+        "required": [
+          "observations"
+        ],
+        "title": "CalibrationRequest"
+      },
+      "CalibrationResponse": {
+        "properties": {
+          "fit_parameters": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Fit Parameters"
+          },
+          "fitted_parameters": {
+            "additionalProperties": {
+              "type": "number"
+            },
+            "type": "object",
+            "title": "Fitted Parameters"
+          },
+          "rmse": {
+            "type": "number",
+            "title": "Rmse"
+          },
+          "mae": {
+            "type": "number",
+            "title": "Mae"
+          },
+          "success": {
+            "type": "boolean",
+            "title": "Success"
+          },
+          "message": {
+            "type": "string",
+            "title": "Message"
+          },
+          "nfev": {
+            "type": "integer",
+            "title": "Nfev"
+          },
+          "parameter_governance": {
+            "$ref": "#/components/schemas/ParameterGovernanceResponse"
+          }
+        },
+        "type": "object",
+        "required": [
+          "fit_parameters",
+          "fitted_parameters",
+          "rmse",
+          "mae",
+          "success",
+          "message",
+          "nfev",
+          "parameter_governance"
+        ],
+        "title": "CalibrationResponse"
+      },
+      "CompareRequest": {
+        "properties": {
+          "baseline": {
+            "$ref": "#/components/schemas/ModelScenario"
+          },
+          "interventions": {
+            "items": {
+              "$ref": "#/components/schemas/InterventionCase"
+            },
+            "type": "array",
+            "minItems": 1,
+            "title": "Interventions"
+          },
+          "mode": {
+            "type": "string",
+            "enum": [
+              "deterministic",
+              "stochastic"
+            ],
+            "title": "Mode",
+            "default": "deterministic"
+          },
+          "seed": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Seed"
+          },
+          "runs": {
+            "type": "integer",
+            "maximum": 500.0,
+            "minimum": 1.0,
+            "title": "Runs",
+            "default": 1
+          }
+        },
+        "type": "object",
+        "required": [
+          "interventions"
+        ],
+        "title": "CompareRequest"
+      },
+      "CompareResponse": {
+        "properties": {
+          "baseline": {
+            "$ref": "#/components/schemas/SimulationSummary"
+          },
+          "interventions": {
+            "items": {
+              "$ref": "#/components/schemas/InterventionDelta"
+            },
+            "type": "array",
+            "title": "Interventions"
+          }
+        },
+        "type": "object",
+        "required": [
+          "baseline",
+          "interventions"
+        ],
+        "title": "CompareResponse"
+      },
+      "DistributionStats": {
+        "properties": {
+          "omega_mean": {
+            "type": "number",
+            "title": "Omega Mean"
+          },
+          "omega_std": {
+            "type": "number",
+            "title": "Omega Std"
+          },
+          "omega_min": {
+            "type": "number",
+            "title": "Omega Min"
+          },
+          "omega_max": {
+            "type": "number",
+            "title": "Omega Max"
+          },
+          "probability_mean": {
+            "type": "number",
+            "title": "Probability Mean"
+          },
+          "probability_std": {
+            "type": "number",
+            "title": "Probability Std"
+          },
+          "probability_min": {
+            "type": "number",
+            "title": "Probability Min"
+          },
+          "probability_max": {
+            "type": "number",
+            "title": "Probability Max"
+          }
+        },
+        "type": "object",
+        "required": [
+          "omega_mean",
+          "omega_std",
+          "omega_min",
+          "omega_max",
+          "probability_mean",
+          "probability_std",
+          "probability_min",
+          "probability_max"
+        ],
+        "title": "DistributionStats"
+      },
+      "EvaluateRequest": {
+        "properties": {
+          "omega": {
+            "type": "number",
+            "title": "Omega"
+          },
+          "theta": {
+            "type": "number",
+            "title": "Theta",
+            "default": 40.0
+          },
+          "extrinsic_x": {
+            "type": "number",
+            "title": "Extrinsic X",
+            "default": 0.0
+          },
+          "probability_gain": {
+            "type": "number",
+            "exclusiveMinimum": 0.0,
+            "title": "Probability Gain",
+            "default": 6.0
+          }
+        },
+        "type": "object",
+        "required": [
+          "omega"
+        ],
+        "title": "EvaluateRequest"
+      },
+      "EvaluateResponse": {
+        "properties": {
+          "probability": {
+            "type": "number",
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Probability"
+          }
+        },
+        "type": "object",
+        "required": [
+          "probability"
+        ],
+        "title": "EvaluateResponse"
+      },
+      "FeedbackStep": {
+        "properties": {
+          "iteration": {
+            "type": "integer",
+            "title": "Iteration"
+          },
+          "psi": {
+            "type": "number",
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Psi"
+          },
+          "omega": {
+            "type": "number",
+            "title": "Omega"
+          },
+          "probability": {
+            "type": "number",
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Probability"
+          }
+        },
+        "type": "object",
+        "required": [
+          "iteration",
+          "psi",
+          "omega",
+          "probability"
+        ],
+        "title": "FeedbackStep"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "InterventionCase": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Name"
+          },
+          "scenario": {
+            "$ref": "#/components/schemas/ModelScenario"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "scenario"
+        ],
+        "title": "InterventionCase"
+      },
+      "InterventionDelta": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "omega": {
+            "type": "number",
+            "title": "Omega"
+          },
+          "probability": {
+            "type": "number",
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Probability"
+          },
+          "delta_omega": {
+            "type": "number",
+            "title": "Delta Omega"
+          },
+          "delta_probability": {
+            "type": "number",
+            "title": "Delta Probability"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "omega",
+          "probability",
+          "delta_omega",
+          "delta_probability"
+        ],
+        "title": "InterventionDelta"
+      },
+      "ModelScenario": {
+        "properties": {
+          "t_start": {
+            "type": "number",
+            "title": "T Start",
+            "default": 0.0
+          },
+          "t_f": {
+            "type": "number",
+            "title": "T F",
+            "default": 1.0
+          },
+          "n_steps": {
+            "type": "integer",
+            "maximum": 4000.0,
+            "minimum": 20.0,
+            "title": "N Steps",
+            "default": 240
+          },
+          "A": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "A",
+            "default": 2.4
+          },
+          "alpha": {
+            "type": "number",
+            "exclusiveMinimum": 0.0,
+            "title": "Alpha",
+            "default": 2.8
+          },
+          "beta": {
+            "type": "number",
+            "exclusiveMinimum": 0.0,
+            "title": "Beta",
+            "default": 0.15
+          },
+          "lambda0": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Lambda0",
+            "default": 0.6
+          },
+          "gamma": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Gamma",
+            "default": 0.2
+          },
+          "C": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "C",
+            "default": 4.2
+          },
+          "iota": {
+            "type": "number",
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Iota",
+            "default": 0.8
+          },
+          "R_s": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "R S",
+            "default": 1.0
+          },
+          "R_f": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "R F",
+            "default": 1.0
+          },
+          "rho": {
+            "type": "number",
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Rho",
+            "default": 0.6
+          },
+          "delta": {
+            "type": "number",
+            "exclusiveMinimum": 0.0,
+            "title": "Delta",
+            "default": 0.05
+          },
+          "X_p0": {
+            "type": "number",
+            "exclusiveMinimum": 0.0,
+            "title": "X P0",
+            "default": 8.0
+          },
+          "sigma_task": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Sigma Task",
+            "default": 0.6
+          },
+          "D0": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "D0",
+            "default": 1.0
+          },
+          "N_d": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "N D",
+            "default": 3
+          },
+          "eta": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Eta",
+            "default": 0.3
+          },
+          "distraction_impact": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Distraction Impact",
+            "default": 0.25
+          },
+          "sigma0": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Sigma0",
+            "default": 0.1
+          },
+          "sigma1": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Sigma1",
+            "default": 0.03
+          },
+          "theta": {
+            "type": "number",
+            "title": "Theta",
+            "default": 40.0
+          },
+          "extrinsic_x": {
+            "type": "number",
+            "title": "Extrinsic X",
+            "default": 0.0
+          },
+          "probability_gain": {
+            "type": "number",
+            "exclusiveMinimum": 0.0,
+            "title": "Probability Gain",
+            "default": 6.0
+          },
+          "psi_gain": {
+            "type": "number",
+            "exclusiveMinimum": 0.0,
+            "title": "Psi Gain",
+            "default": 8.0
+          },
+          "psi_midpoint": {
+            "type": "number",
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Psi Midpoint",
+            "default": 0.5
+          },
+          "feedback_iterations": {
+            "type": "integer",
+            "maximum": 50.0,
+            "minimum": 1.0,
+            "title": "Feedback Iterations",
+            "default": 8
+          },
+          "feedback_tolerance": {
+            "type": "number",
+            "exclusiveMinimum": 0.0,
+            "title": "Feedback Tolerance",
+            "default": 0.0001
+          }
+        },
+        "type": "object",
+        "title": "ModelScenario"
+      },
+      "ObservationPoint": {
+        "properties": {
+          "time": {
+            "type": "number",
+            "title": "Time"
+          },
+          "output": {
+            "type": "number",
+            "title": "Output"
+          }
+        },
+        "type": "object",
+        "required": [
+          "time",
+          "output"
+        ],
+        "title": "ObservationPoint"
+      },
+      "ParameterGovernanceResponse": {
+        "properties": {
+          "scenario_inputs": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Scenario Inputs"
+          },
+          "fitted_parameters": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Fitted Parameters"
+          },
+          "notes": {
+            "type": "string",
+            "title": "Notes"
+          }
+        },
+        "type": "object",
+        "required": [
+          "scenario_inputs",
+          "fitted_parameters",
+          "notes"
+        ],
+        "title": "ParameterGovernanceResponse"
+      },
+      "SensitivityItem": {
+        "properties": {
+          "parameter": {
+            "type": "string",
+            "title": "Parameter"
+          },
+          "base_value": {
+            "type": "number",
+            "title": "Base Value"
+          },
+          "plus_value": {
+            "type": "number",
+            "title": "Plus Value"
+          },
+          "minus_value": {
+            "type": "number",
+            "title": "Minus Value"
+          },
+          "metric_plus": {
+            "type": "number",
+            "title": "Metric Plus"
+          },
+          "metric_minus": {
+            "type": "number",
+            "title": "Metric Minus"
+          },
+          "gradient": {
+            "type": "number",
+            "title": "Gradient"
+          },
+          "normalized_impact": {
+            "type": "number",
+            "title": "Normalized Impact"
+          }
+        },
+        "type": "object",
+        "required": [
+          "parameter",
+          "base_value",
+          "plus_value",
+          "minus_value",
+          "metric_plus",
+          "metric_minus",
+          "gradient",
+          "normalized_impact"
+        ],
+        "title": "SensitivityItem"
+      },
+      "SensitivityRequest": {
+        "properties": {
+          "scenario": {
+            "$ref": "#/components/schemas/ModelScenario"
+          },
+          "parameters": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Parameters"
+          },
+          "relative_step": {
+            "type": "number",
+            "maximum": 0.5,
+            "exclusiveMinimum": 0.0,
+            "title": "Relative Step",
+            "default": 0.05
+          },
+          "target": {
+            "type": "string",
+            "enum": [
+              "omega",
+              "probability"
+            ],
+            "title": "Target",
+            "default": "probability"
+          }
+        },
+        "type": "object",
+        "title": "SensitivityRequest"
+      },
+      "SensitivityResponse": {
+        "properties": {
+          "target": {
+            "type": "string",
+            "enum": [
+              "omega",
+              "probability"
+            ],
+            "title": "Target"
+          },
+          "base_metric": {
+            "type": "number",
+            "title": "Base Metric"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/SensitivityItem"
+            },
+            "type": "array",
+            "title": "Items"
+          }
+        },
+        "type": "object",
+        "required": [
+          "target",
+          "base_metric",
+          "items"
+        ],
+        "title": "SensitivityResponse"
+      },
+      "SimulateRequest": {
+        "properties": {
+          "scenario": {
+            "$ref": "#/components/schemas/ModelScenario"
+          },
+          "mode": {
+            "type": "string",
+            "enum": [
+              "deterministic",
+              "stochastic"
+            ],
+            "title": "Mode",
+            "default": "deterministic"
+          },
+          "seed": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Seed"
+          },
+          "runs": {
+            "type": "integer",
+            "maximum": 500.0,
+            "minimum": 1.0,
+            "title": "Runs",
+            "default": 1
+          }
+        },
+        "type": "object",
+        "title": "SimulateRequest"
+      },
+      "SimulationResponse": {
+        "properties": {
+          "summary": {
+            "$ref": "#/components/schemas/SimulationSummary"
+          },
+          "trajectory": {
+            "items": {
+              "$ref": "#/components/schemas/TrajectoryPoint"
+            },
+            "type": "array",
+            "title": "Trajectory"
+          },
+          "feedback": {
+            "items": {
+              "$ref": "#/components/schemas/FeedbackStep"
+            },
+            "type": "array",
+            "title": "Feedback"
+          },
+          "distribution": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/DistributionStats"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "summary",
+          "trajectory",
+          "feedback"
+        ],
+        "title": "SimulationResponse"
+      },
+      "SimulationSummary": {
+        "properties": {
+          "omega": {
+            "type": "number",
+            "title": "Omega"
+          },
+          "probability": {
+            "type": "number",
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Probability"
+          },
+          "psi": {
+            "type": "number",
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Psi"
+          },
+          "phi": {
+            "type": "number",
+            "title": "Phi"
+          },
+          "lambda_c": {
+            "type": "number",
+            "title": "Lambda C"
+          },
+          "peak_output": {
+            "type": "number",
+            "title": "Peak Output"
+          },
+          "peak_time": {
+            "type": "number",
+            "title": "Peak Time"
+          },
+          "mode": {
+            "type": "string",
+            "enum": [
+              "deterministic",
+              "stochastic"
+            ],
+            "title": "Mode"
+          },
+          "runs": {
+            "type": "integer",
+            "minimum": 1.0,
+            "title": "Runs"
+          }
+        },
+        "type": "object",
+        "required": [
+          "omega",
+          "probability",
+          "psi",
+          "phi",
+          "lambda_c",
+          "peak_output",
+          "peak_time",
+          "mode",
+          "runs"
+        ],
+        "title": "SimulationSummary"
+      },
+      "TrajectoryPoint": {
+        "properties": {
+          "time": {
+            "type": "number",
+            "title": "Time"
+          },
+          "stress": {
+            "type": "number",
+            "title": "Stress"
+          },
+          "focus": {
+            "type": "number",
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Focus"
+          },
+          "distraction": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Distraction"
+          },
+          "output": {
+            "type": "number",
+            "title": "Output"
+          },
+          "terminal_gate": {
+            "type": "number",
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Terminal Gate"
+          }
+        },
+        "type": "object",
+        "required": [
+          "time",
+          "stress",
+          "focus",
+          "distraction",
+          "output",
+          "terminal_gate"
+        ],
+        "title": "TrajectoryPoint"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "ctx": {
+            "type": "object",
+            "title": "Context"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
+      }
+    }
+  }
+}
