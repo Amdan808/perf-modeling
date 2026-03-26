@@ -15,6 +15,16 @@ The model formalizes a self-observed pattern:
 
 The practical goal is intervention design: engineering conditions that trigger peak performance earlier, rather than waiting for last-minute pressure.
 
+## Non-technical summary (60 seconds)
+
+Think of performance like an engine controlled by pressure:
+
+- Too little pressure: slow start and drift.
+- Enough pressure: focus locks in and output rises.
+- Too much pressure: overload risk and inconsistency increase.
+
+This project simulates that curve over time, then estimates how likely the total work is to clear a success threshold.
+
 ## What this repository includes
 
 - **Python backend (FastAPI):** simulation, evaluation, calibration, sensitivity ranking, intervention comparison.
@@ -46,6 +56,41 @@ This implementation closes key logical gaps from the original conceptual draft:
 - Smooth terminal gate near deadline (no hard discontinuity).
 - Integrated distraction-focus coupling (`D_max -> D(S) -> F(S)`).
 - Parameter governance split between scenario inputs and fitted parameters.
+
+## Quick math examples (illustrative)
+
+### 1) Stress increases as deadline gets closer
+
+`S = (C * psi) / (t_f - t + delta)`
+
+Using `C = 4.2`, `psi = 0.8`, `t_f = 1.0`, `delta = 0.05`:
+
+- At `t = 0.20`: `S = 3.36 / 0.85 ~= 3.95`
+- At `t = 0.80`: `S = 3.36 / 0.25 = 13.44`
+
+Same stakes, much higher stress near the deadline.
+
+### 2) More task stimulation lowers focus threshold
+
+`X_p = X_p0 / (1 + sigma_task)`
+
+Using `X_p0 = 8`:
+
+- If `sigma_task = 0.6`, then `X_p = 8 / 1.6 = 5.0`
+- If `sigma_task = 1.0`, then `X_p = 8 / 2.0 = 4.0`
+
+Higher stimulation means full focus is reached at lower stress.
+
+### 3) Accumulated output shifts success probability
+
+`p = sigmoid(gain * ((Omega - theta) / |theta| + X))`
+
+Using `theta = 40`, `gain = 6`, `X = 0`:
+
+- If `Omega = 38`, then `p ~= 0.43`
+- If `Omega = 44`, then `p ~= 0.65`
+
+A moderate increase in accumulated output can materially raise success odds.
 
 ## Tech stack
 
