@@ -800,25 +800,32 @@ function App() {
           <div className="chart-grid">
             <article className="chart-card">
               <h3>Output trajectory</h3>
-              <ResponsiveContainer width="100%" height={280}>
-                <LineChart data={simulation.trajectory}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="time" />
-                  <YAxis />
-                  <Tooltip />
-                  <Legend />
+              <ResponsiveContainer width="100%" height={300}>
+                <LineChart data={simulation.trajectory} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+                  <XAxis dataKey="time" stroke="#64748b" fontSize={12} tickLine={false} />
+                  <YAxis stroke="#64748b" fontSize={12} tickLine={false} axisLine={false} />
+                  <Tooltip 
+                    contentStyle={{ borderRadius: '8px', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)' }}
+                  />
+                  <Legend wrapperStyle={{ paddingTop: '10px' }} />
                   <Line
                     type="monotone"
                     dataKey="output"
-                    stroke="#2563eb"
+                    name="Output"
+                    stroke="#8b5cf6"
                     dot={false}
-                    strokeWidth={2}
+                    strokeWidth={2.5}
+                    activeDot={{ r: 5, fill: '#8b5cf6' }}
                   />
                   <Line
                     type="monotone"
                     dataKey="terminal_gate"
-                    stroke="#64748b"
+                    name="Terminal Gate"
+                    stroke="#94a3b8"
                     dot={false}
+                    strokeWidth={1.5}
+                    strokeDasharray="5 5"
                   />
                 </LineChart>
               </ResponsiveContainer>
@@ -826,34 +833,42 @@ function App() {
 
             <article className="chart-card">
               <h3>Stress and focus</h3>
-              <ResponsiveContainer width="100%" height={280}>
-                <LineChart data={simulation.trajectory}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="time" />
-                  <YAxis yAxisId="left" />
-                  <YAxis yAxisId="right" orientation="right" domain={[0, 1]} />
-                  <Tooltip />
-                  <Legend />
+              <ResponsiveContainer width="100%" height={300}>
+                <LineChart data={simulation.trajectory} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+                  <XAxis dataKey="time" stroke="#64748b" fontSize={12} tickLine={false} />
+                  <YAxis yAxisId="left" stroke="#64748b" fontSize={12} tickLine={false} axisLine={false} />
+                  <YAxis yAxisId="right" orientation="right" domain={[0, 1]} stroke="#64748b" fontSize={12} tickLine={false} axisLine={false} />
+                  <Tooltip 
+                    contentStyle={{ borderRadius: '8px', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)' }}
+                  />
+                  <Legend wrapperStyle={{ paddingTop: '10px' }} />
                   <Line
                     yAxisId="left"
                     type="monotone"
                     dataKey="stress"
-                    stroke="#7c3aed"
+                    name="Stress"
+                    stroke="#8b5cf6"
                     dot={false}
+                    strokeWidth={2}
                   />
                   <Line
                     yAxisId="right"
                     type="monotone"
                     dataKey="focus"
-                    stroke="#16a34a"
+                    name="Focus"
+                    stroke="#10b981"
                     dot={false}
+                    strokeWidth={2}
                   />
                   <Line
                     yAxisId="left"
                     type="monotone"
                     dataKey="distraction"
-                    stroke="#ea580c"
+                    name="Distraction"
+                    stroke="#f97316"
                     dot={false}
+                    strokeWidth={2}
                   />
                 </LineChart>
               </ResponsiveContainer>
@@ -1083,14 +1098,23 @@ function App() {
 
             <article className="chart-card">
               <h3>Probability comparison</h3>
-              <ResponsiveContainer width="100%" height={280}>
-                <BarChart data={compareChartData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="name" />
-                  <YAxis domain={[0, 1]} />
-                  <Tooltip />
-                  <Legend />
-                  <Bar dataKey="probability" fill="#1d4ed8" />
+              <ResponsiveContainer width="100%" height={300}>
+                <BarChart data={compareChartData} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
+                  <XAxis dataKey="name" stroke="#64748b" fontSize={12} tickLine={false} axisLine={false} />
+                  <YAxis domain={[0, 1]} stroke="#64748b" fontSize={12} tickLine={false} axisLine={false} />
+                  <Tooltip 
+                    contentStyle={{ borderRadius: '8px', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)' }}
+                    cursor={{ fill: 'rgba(139, 92, 246, 0.1)' }}
+                  />
+                  <Legend wrapperStyle={{ paddingTop: '10px' }} />
+                  <Bar 
+                    dataKey="probability" 
+                    name="Probability"
+                    fill="#8b5cf6" 
+                    radius={[6, 6, 0, 0]}
+                    maxBarSize={60}
+                  />
                 </BarChart>
               </ResponsiveContainer>
             </article>
