@@ -136,6 +136,22 @@ Open the app and choose either:
 - `Dashboard` for simulation, sensitivity, and intervention testing.
 - `Public presentation` for a concise narrative suitable for GitHub/public readers.
 
+## Dashboard interface quick guide
+
+The dashboard is graph-first and tuned for focus:
+
+- **Default focus mode:** shows the live equation graph with quick parameter sliders.
+- **Simple / Advanced toggle:** switches depth of controls and persists your preference.
+- **Backend & Data drawer (`⚙`):** collapsed by default; contains API URL, backend status, import/export, and governance info.
+- **Secondary tabs below the fold:** `Sensitivity` and `Interventions` keep analysis tools available without distracting from the main chart.
+- **Advanced parameter editor:** stays inside an accordion for progressive disclosure.
+
+Live chart behavior:
+
+- The top chart updates in real time from sliders and plots `P(t)`, `F(t)`, and `S(t)`.
+- `Time -> deadline (normalized)` is displayed below the chart for readability.
+- The cumulative chart visualizes `Omega(t) = integral P(t) dt` with a line-swatch legend.
+
 ## API overview
 
 - `GET /health` — health check
