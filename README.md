@@ -1,4 +1,4 @@
-# Performance Under Pressure — Executable Mathematical Model
+# Performance Optimizer — Mathematical Model
 
 This project started as an observation linking psychology and mathematics:
 performance can become sharper and more reliable under high-stakes, time-pressured conditions.
