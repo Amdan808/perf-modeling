@@ -44,22 +44,22 @@ function PresentationView() {
           <article className="presentation-card">
             <h3>Layer 1: Output engine</h3>
             <p>
-              Models instantaneous performance <code>P(t)</code> from stress,
-              capability, focus, and fatigue.
+              Models instant performance output <code>P(t)</code> from
+              consequence pressure, capability baseline, focus, and fatigue.
             </p>
             <p className="presentation-equation">
-              <code>P(t) = A * Phi * S^alpha * exp(-beta*S) * exp(-lambda*t) * F(S) + epsilon</code>
+              <code>Output = capability * potential * stress-response * focus * fatigue-control</code>
             </p>
           </article>
 
           <article className="presentation-card">
             <h3>Layer 2: Outcome evaluation</h3>
             <p>
-              Maps accumulated output <code>Omega</code> against threshold{' '}
-              <code>theta</code> into success probability <code>p</code>.
+              Maps accumulated output against the required success threshold into
+              a success probability.
             </p>
             <p className="presentation-equation">
-              <code>Omega = integral(P(t)dt), p = g(Omega, theta, X)</code>
+              <code>Total output over time + external factors -&gt; success probability</code>
             </p>
           </article>
         </div>
@@ -69,14 +69,14 @@ function PresentationView() {
         <h2>Core intuition</h2>
         <ul className="presentation-list">
           <li>
-            Stakes and deadline pressure increase stress; moderate stress
-            improves activation.
+            Higher consequence pressure and tighter deadlines increase stress;
+            moderate stress improves activation.
           </li>
           <li>
             Excess stress can overload performance unless focus remains high.
           </li>
           <li>
-            Task stimulation reduces the stress required to enter full focus.
+            Task stimulation lowers the stress needed to reach full focus.
           </li>
           <li>
             Belief in consequence reality affects effective stakes and therefore

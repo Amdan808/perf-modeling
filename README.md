@@ -1,124 +1,110 @@
-# Performance Optimizer — Mathematical Model
+# Performance Optimizer — Unified Project Guide
 
-This project started as an observation linking psychology and mathematics:
-performance can become sharper and more reliable under high-stakes, time-pressured conditions.
+This repository implements a mathematical model of **performance under pressure** with a Python backend and a React frontend.
 
-The repository turns that idea into a runnable system you can inspect, simulate, and discuss.
+![Dashboard screenshot 1](assets/UI-1.png)
 
-## Origin & intent
+![Dashboard screenshot 2](assets/UI-2.png)
 
-The model formalizes a self-observed pattern:
+## Why this exists
 
-- Output often stays low during long horizons.
-- Performance rises steeply near hard deadlines.
-- Stakes, perceived consequence, and focus dynamics shape this curve.
+The model formalizes a practical observation:
 
-The practical goal is intervention design: engineering conditions that trigger peak performance earlier, rather than waiting for last-minute pressure.
+- Output can stay low early in long horizons.
+- Performance can rise sharply near hard deadlines.
+- Stakes, focus, fatigue, and perceived consequence reality shape this curve.
 
-## Non-technical summary
+The practical objective is intervention design: create conditions that trigger high performance earlier.
 
-Think of performance like an engine controlled by pressure:
+## Repository contents
 
-- Too little pressure : slow start and drift, you still have time don't worry 😎.
-- Enough pressure : normies lock in and output rises, weirdos are chilling 🤓.
-- Too much pressure : overload risk but performance ignites, especially for weirdos like myself 🙀.
-
-This project simulates that curve over time, then estimates how likely the total work is to clear a success threshold.
-
-## What this repository includes
-
-- **Python backend (FastAPI):** simulation, evaluation, calibration, sensitivity ranking, intervention comparison.
-- **TypeScript web app (React + Vite):**
-  - `Dashboard` mode for interactive analysis.
-  - `Public presentation` mode for non-technical explanation.
-- **Conceptual reference:** `performance_model.md` (original model narrative and symbols).
+- **Backend (`src/performance_model`)**
+  - FastAPI endpoints for simulation, evaluation, calibration, sensitivity, and intervention comparison
+  - Pydantic schemas and parameter governance
+  - Numerical model implementation with NumPy/SciPy
+- **Frontend (`web`)**
+  - React + TypeScript + Vite dashboard
+  - Interactive graphing, presets, sensitivity tools, and intervention comparison
+  - Public presentation mode
+- **Tests (`tests`)**
+  - Backend API and model tests
 
 ## Repository layout
 
 ```text
 .
-├── performance_model.md          # conceptual model and assumptions
-├── src/performance_model/        # backend package
-├── tests/                        # backend tests
-└── web/                          # frontend dashboard
+├── README.md
+├── pyproject.toml
+├── requirements.txt
+├── src/performance_model/
+├── tests/
+└── web/
 ```
 
-## Model at a glance
+## Model overview
 
-The system is two-layer:
+The implementation uses a two-layer architecture:
 
-- **Layer 1: Output engine** models instantaneous performance `P(t)` from stress, capability, focus, fatigue, and noise.
-- **Layer 2: Outcome evaluation** maps accumulated output `Ω` against threshold `θ` into success probability `p`.
+- **Layer 1 (output engine):** models instantaneous output `P(t)` from stress, capability, focus/distraction, fatigue, and noise.
+- **Layer 2 (outcome evaluation):** maps accumulated output `Ω` against threshold `θ` and extrinsic factors into success probability `p`.
 
-This implementation closes key logical gaps from the original conceptual draft:
+There is a feedback path where estimated probability influences perceived consequence reality `ψ`, which scales effective stress.
 
-- Explicit bounded `g(Ω, θ, X)` and `ψ = f(p, ρ, ι)` forms.
-- Smooth terminal gate near deadline (no hard discontinuity).
-- Integrated distraction-focus coupling (`D_max -> D(S) -> F(S)`).
-- Parameter governance split between scenario inputs and fitted parameters.
+## Public-friendly parameter names
 
-## Quick math examples (illustrative)
+The app uses plain-English labels in the UI while keeping technical API keys stable for compatibility.
 
-### 1) Stress increases as deadline gets closer
+Examples:
 
-`S = (C * psi) / (t_f - t + delta)`
+- `C` -> **Consequence pressure**
+- `alpha` -> **Stress activation sensitivity**
+- `beta` -> **Stress overload sensitivity**
+- `X_p0` -> **Focus threshold baseline**
+- `sigma_task` -> **Task stimulation level**
+- `theta` -> **Success threshold**
 
-Using `C = 4.2`, `psi = 0.8`, `t_f = 1.0`, `delta = 0.05`:
+## Key equations
 
-- At `t = 0.20`: `S = 3.36 / 0.85 ~= 3.95`
-- At `t = 0.80`: `S = 3.36 / 0.25 = 13.44`
+Stress:
 
-Same stakes, much higher stress near the deadline.
+`S(t) = (C * ψ) / (t_f - t + δ)`
 
-### 2) More task stimulation lowers focus threshold
+Potential:
 
-`X_p = X_p0 / (1 + sigma_task)`
+`Φ = ι * (R_s * R_f) * (1 + ρ)`
 
-Using `X_p0 = 8`:
+Fatigue suppression:
 
-- If `sigma_task = 0.6`, then `X_p = 8 / 1.6 = 5.0`
-- If `sigma_task = 1.0`, then `X_p = 8 / 2.0 = 4.0`
+`λ(C) = λ0 * exp(-γC)`
 
-Higher stimulation means full focus is reached at lower stress.
+Outcome probability:
 
-### 3) Accumulated output shifts success probability
+`p = sigmoid(gain * (((Ω - θ) / |θ|) + X))`
 
-`p = sigmoid(gain * ((Omega - theta) / |theta| + X))`
+## API endpoints
 
-Using `theta = 40`, `gain = 6`, `X = 0`:
+- `GET /health`
+- `GET /parameter-governance`
+- `POST /simulate`
+- `POST /evaluate`
+- `POST /calibrate`
+- `POST /sensitivity`
+- `POST /compare-interventions`
 
-- If `Omega = 38`, then `p ~= 0.43`
-- If `Omega = 44`, then `p ~= 0.65`
-
-A moderate increase in accumulated output can materially raise success odds.
-
-## Tech stack
-
-- Backend: Python 3.12+, FastAPI, Pydantic v2, NumPy, SciPy, Pytest
-- Frontend: React 19, TypeScript, Vite, Recharts, `openapi-typescript`
+OpenAPI docs: `http://127.0.0.1:8000/docs`
 
 ## Quick start
 
 ### 1) Start backend
 
-From repository root:
+From repo root:
 
 ```bash
 python3 -m venv .venv
 . .venv/bin/activate
 pip install -r requirements.txt
-```
-
-Run the API server:
-
-```bash
 uvicorn performance_model.main:app --app-dir src --host 127.0.0.1 --port 8000
 ```
-
-Open API docs:
-
-- Swagger UI: `http://127.0.0.1:8000/docs`
-- OpenAPI JSON: `http://127.0.0.1:8000/openapi.json`
 
 ### 2) Start frontend
 
@@ -129,50 +115,11 @@ npm install
 npm run dev
 ```
 
-The web app defaults to API base URL `http://127.0.0.1:8000`.
-
-Open the app and choose either:
-
-- `Dashboard` for simulation, sensitivity, and intervention testing.
-- `Public presentation` for a concise narrative suitable for GitHub/public readers.
-
-## Dashboard interface quick guide
-
-The dashboard is graph-first and tuned for focus:
-
-- **Default focus mode:** shows the live equation graph with quick parameter sliders.
-- **Simple / Advanced toggle:** switches depth of controls and persists your preference.
-- **Backend & Data drawer (`⚙`):** collapsed by default; contains API URL, backend status, import/export, and governance info.
-- **Secondary tabs below the fold:** `Sensitivity` and `Interventions` keep analysis tools available without distracting from the main chart.
-- **Advanced parameter editor:** stays inside an accordion for progressive disclosure.
-
-Live chart behavior:
-
-- The top chart updates in real time from sliders and plots `P(t)`, `F(t)`, and `S(t)`.
-- `Time -> deadline (normalized)` is displayed below the chart for readability.
-- The cumulative chart visualizes `Omega(t) = integral P(t) dt` with a line-swatch legend.
-
-## API overview
-
-- `GET /health` — health check
-- `GET /parameter-governance` — fixed vs fitted parameter roles
-- `POST /simulate` — run deterministic or stochastic scenario simulation
-- `POST /evaluate` — compute outcome probability from `omega`, `theta`, and extrinsic factors
-- `POST /calibrate` — fit allowed behavioral parameters (`alpha`, `beta`, `lambda0`, `gamma`)
-- `POST /sensitivity` — rank local parameter impact
-- `POST /compare-interventions` — baseline vs intervention deltas
-
-## Model governance notes
-
-- Scenario inputs (for conditions/introspection): includes values such as `iota`, `rho`, `R_s`, `R_f`.
-- Fitted parameters (for calibration): `alpha`, `beta`, `lambda0`, `gamma`.
-- Unsupported fit parameters are rejected with HTTP 400 by design.
+Default frontend API URL: `http://127.0.0.1:8000`.
 
 ## Development checks
 
 ### Backend
-
-From repository root:
 
 ```bash
 . .venv/bin/activate
@@ -181,19 +128,18 @@ pytest -q
 
 ### Frontend
 
-From `web/`:
-
 ```bash
+cd web
 npm run lint
 npm run build
 ```
 
 ## Regenerate frontend API types
 
-If backend request/response schemas change:
+If backend schemas change:
 
 ```bash
-# from repository root
+# from repo root
 . .venv/bin/activate
 PYTHONPATH=src python - <<'PY'
 import json
@@ -206,6 +152,11 @@ PY
 npm run generate:api
 ```
 
-## Notes
+## CI
 
-- Frontend build is split into `react`, `charts`, and `vendor` chunks (`web/vite.config.ts`) to keep initial payload smaller.
+GitHub Actions workflow: `.github/workflows/ci.yml`
+
+Runs:
+
+- Backend tests (`pytest -q`)
+- Frontend lint and build (`npm run lint`, `npm run build`)

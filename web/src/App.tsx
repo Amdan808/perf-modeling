@@ -39,284 +39,32 @@ import {
   type ScenarioPresetKey,
 } from './modelDefaults'
 import PresentationView from './PresentationView'
-
-type ScenarioField = {
-  key: keyof ModelScenario
-  label: string
-  step: number
-  min?: number
-  max?: number
-}
-
-type ScenarioFieldGroup = {
-  title: string
-  fields: ScenarioField[]
-}
-
-type Intervention = {
-  id: string
-  name: string
-  scenario: ModelScenario
-}
-
-type QuickSlider = {
-  key: keyof ModelScenario
-  label: string
-  min: number
-  max: number
-  step: number
-}
-
-type QuickSliderGroup = {
-  title: string
-  sliders: QuickSlider[]
-}
-
-type SecondaryTab = 'analysis' | 'interventions'
-
-type ImportPayload = {
-  scenario?: unknown
-  mode?: unknown
-  runs?: unknown
-  seed?: unknown
-  sensitivityParameters?: unknown
-  sensitivityTarget?: unknown
-  interventions?: unknown
-}
-
-const FIELD_GROUPS: ScenarioFieldGroup[] = [
-  {
-    title: 'Core dynamics',
-    fields: [
-      { key: 'A', label: 'A (capability)', step: 0.05, min: 0 },
-      { key: 'alpha', label: 'alpha', step: 0.05, min: 0.000001 },
-      { key: 'beta', label: 'beta', step: 0.01, min: 0.000001 },
-      { key: 'C', label: 'C (stakes)', step: 0.1, min: 0 },
-      { key: 't_f', label: 't_f (deadline)', step: 0.01 },
-      { key: 'delta', label: 'delta', step: 0.01, min: 0.000001 },
-      { key: 'n_steps', label: 'n_steps', step: 1, min: 20, max: 4000 },
-    ],
-  },
-  {
-    title: 'Fatigue and noise',
-    fields: [
-      { key: 'lambda0', label: 'lambda0', step: 0.05, min: 0 },
-      { key: 'gamma', label: 'gamma', step: 0.05, min: 0 },
-      { key: 'sigma0', label: 'sigma0', step: 0.01, min: 0 },
-      { key: 'sigma1', label: 'sigma1', step: 0.01, min: 0 },
-    ],
-  },
-  {
-    title: 'Focus and distraction',
-    fields: [
-      { key: 'X_p0', label: 'X_p0', step: 0.1, min: 0.000001 },
-      { key: 'sigma_task', label: 'sigma_task', step: 0.05, min: 0 },
-      { key: 'D0', label: 'D0', step: 0.05, min: 0 },
-      { key: 'N_d', label: 'N_d', step: 1, min: 0 },
-      { key: 'eta', label: 'eta', step: 0.05, min: 0 },
-      {
-        key: 'distraction_impact',
-        label: 'distraction_impact',
-        step: 0.05,
-        min: 0,
-      },
-    ],
-  },
-  {
-    title: 'Feedback and outcome',
-    fields: [
-      { key: 'iota', label: 'iota', step: 0.05, min: 0, max: 1 },
-      { key: 'rho', label: 'rho', step: 0.05, min: 0, max: 1 },
-      { key: 'R_s', label: 'R_s', step: 0.1, min: 0 },
-      { key: 'R_f', label: 'R_f', step: 0.1, min: 0 },
-      { key: 'theta', label: 'theta', step: 0.5 },
-      { key: 'extrinsic_x', label: 'extrinsic_x', step: 0.05 },
-      {
-        key: 'probability_gain',
-        label: 'probability_gain',
-        step: 0.1,
-        min: 0.000001,
-      },
-      { key: 'psi_gain', label: 'psi_gain', step: 0.1, min: 0.000001 },
-      {
-        key: 'psi_midpoint',
-        label: 'psi_midpoint',
-        step: 0.05,
-        min: 0,
-        max: 1,
-      },
-      {
-        key: 'feedback_iterations',
-        label: 'feedback_iterations',
-        step: 1,
-        min: 1,
-        max: 50,
-      },
-      {
-        key: 'feedback_tolerance',
-        label: 'feedback_tolerance',
-        step: 0.0001,
-        min: 0.000001,
-      },
-    ],
-  },
-]
-
-const DEFAULT_SENSITIVITY_PARAMS =
-  'alpha,beta,lambda0,gamma,C,sigma_task,t_f,iota,rho'
-
-const EPSILON = 1e-9
-const STRESS_DISPLAY_CAP = 20
-const STRESS_MODEL_CAP = 40
-
-const QUICK_SLIDER_GROUPS: QuickSliderGroup[] = [
-  {
-    title: 'Stakes & potential',
-    sliders: [
-      { key: 'C', label: 'C', min: 0, max: 12, step: 0.1 },
-      { key: 'iota', label: 'iota', min: 0, max: 1, step: 0.01 },
-      { key: 'rho', label: 'rho', min: 0, max: 1, step: 0.01 },
-      { key: 'R_s', label: 'R_s', min: 0, max: 5, step: 0.1 },
-      { key: 'R_f', label: 'R_f', min: 0, max: 5, step: 0.1 },
-      { key: 'theta', label: 'theta', min: 1, max: 120, step: 1 },
-    ],
-  },
-  {
-    title: 'Stress response',
-    sliders: [
-      { key: 'alpha', label: 'alpha', min: 0.1, max: 6, step: 0.05 },
-      { key: 'beta', label: 'beta', min: 0.01, max: 2, step: 0.01 },
-      { key: 'A', label: 'A', min: 0.1, max: 6, step: 0.05 },
-      { key: 'lambda0', label: 'lambda0', min: 0, max: 3, step: 0.01 },
-      { key: 'gamma', label: 'gamma', min: 0, max: 2, step: 0.01 },
-      { key: 't_f', label: 't_f', min: 0.2, max: 2, step: 0.01 },
-    ],
-  },
-  {
-    title: 'Focus & distraction',
-    sliders: [
-      { key: 'sigma_task', label: 'sigma_task', min: 0, max: 3, step: 0.05 },
-      { key: 'X_p0', label: 'X_p0', min: 0.1, max: 20, step: 0.1 },
-      { key: 'D0', label: 'D0', min: 0, max: 8, step: 0.05 },
-      { key: 'N_d', label: 'N_d', min: 0, max: 10, step: 1 },
-      { key: 'eta', label: 'eta', min: 0, max: 2, step: 0.01 },
-      {
-        key: 'distraction_impact',
-        label: 'distraction_impact',
-        min: 0,
-        max: 2,
-        step: 0.01,
-      },
-    ],
-  },
-]
-
-const CHART_COLORS = {
-  output: '#4ca3ff',
-  stress: '#ff5f68',
-  focus: '#22c89a',
-  omega: '#d7942f',
-  axis: '#9ca3af',
-  grid: 'rgba(255, 255, 255, 0.12)',
-  tooltipBackground: '#121316',
-  tooltipBorder: '#2f333b',
-}
-
-function interventionTemplate(
-  scenario: ModelScenario,
-  name: string,
-  patch: Partial<ModelScenario>,
-): Intervention {
-  return {
-    id: `${Date.now()}-${Math.random().toString(16).slice(2)}`,
-    name,
-    scenario: mergeScenario(scenario, patch),
-  }
-}
-
-function defaultInterventions(base: ModelScenario): Intervention[] {
-  return [
-    interventionTemplate(base, 'Public commitment', {
-      C: base.C * 1.25,
-      iota: Math.min(1, base.iota + 0.05),
-    }),
-    interventionTemplate(base, 'Stimulation boost', {
-      sigma_task: base.sigma_task + 0.4,
-      N_d: Math.max(0, base.N_d - 1),
-    }),
-    interventionTemplate(base, 'Sub-deadline compression', {
-      t_f: Math.max(base.t_start + 0.2, base.t_f * 0.75),
-      delta: Math.max(0.01, base.delta * 0.8),
-    }),
-  ]
-}
-
-function parseSeed(seedText: string): number | null | undefined {
-  if (seedText.trim() === '') {
-    return null
-  }
-
-  const value = Number(seedText)
-  if (!Number.isFinite(value)) {
-    return undefined
-  }
-
-  return Math.round(value)
-}
-
-function formatNumber(value: number): string {
-  if (Math.abs(value) >= 100 || Number.isInteger(value)) {
-    return value.toFixed(2)
-  }
-  return value.toPrecision(4)
-}
-
-function formatSliderValue(value: number, step: number): string {
-  if (step >= 1) {
-    return String(Math.round(value))
-  }
-  if (step >= 0.1) {
-    return value.toFixed(1)
-  }
-  if (step >= 0.01) {
-    return value.toFixed(2)
-  }
-  return value.toFixed(3)
-}
-
-function normalizeSliderValue(value: number, step: number): number {
-  if (step >= 1) {
-    return Math.round(value)
-  }
-  return value
-}
-
-function NumberInput(props: {
-  value: number
-  step: number
-  min?: number
-  max?: number
-  onChange: (value: number) => void
-}) {
-  const { value, step, min, max, onChange } = props
-
-  return (
-    <input
-      type="number"
-      className="number-field"
-      value={value}
-      step={step}
-      min={min}
-      max={max}
-      onChange={(event) => {
-        const next = Number(event.currentTarget.value)
-        if (Number.isFinite(next)) {
-          onChange(next)
-        }
-      }}
-    />
-  )
-}
+import NumberInput from './components/NumberInput'
+import InfoTooltip from './components/InfoTooltip'
+import {
+  CHART_COLORS,
+  DEFAULT_SENSITIVITY_PARAMS,
+  FIELD_GROUPS,
+  QUICK_SLIDER_GROUPS,
+} from './dashboard/constants'
+import { computeLivePreview } from './dashboard/liveModel'
+import type { ImportPayload, Intervention, SecondaryTab } from './dashboard/types'
+import {
+  getPublicParameterDescription,
+  getPublicParameterDescriptionFromKey,
+  getPublicParameterLabelWithKey,
+  parsePublicParameterInput,
+} from './dashboard/parameterNames'
+import {
+  clampRuns,
+  createIntervention,
+  createStableId,
+  defaultInterventions,
+  formatNumber,
+  formatSliderValue,
+  normalizeSliderValue,
+  parseSeed,
+} from './dashboard/utils'
 
 function App() {
   const [viewMode, setViewMode] = useState<'dashboard' | 'presentation'>(
@@ -402,109 +150,9 @@ function App() {
     ]
   }, [comparison])
 
-  const liveEquationTrajectory = useMemo(() => {
-    const tStart = scenario.t_start
-    const tF = Math.max(scenario.t_f, tStart + 0.001)
-    const span = Math.max(tF - tStart, EPSILON)
-    const points = Math.max(80, Math.min(900, Math.round(scenario.n_steps)))
-
-    const phi = scenario.iota * scenario.R_s * scenario.R_f * (1 + scenario.rho)
-    const lambdaC = scenario.lambda0 * Math.exp(-scenario.gamma * scenario.C)
-    const xp = scenario.X_p0 / Math.max(1 + scenario.sigma_task, EPSILON)
-    const dMax = scenario.D0 * (1 + scenario.eta * scenario.N_d)
-
-    let cumulative = 0
-    let previousT = tStart
-
-    const series: Array<{
-      time: number
-      time_n: number
-      stress: number
-      output: number
-      focus: number
-      cumulative_output: number
-    }> = []
-
-    for (let i = 0; i <= points; i += 1) {
-      const t = tStart + (i / points) * span
-      const timeN = (t - tStart) / span
-
-      const remaining = Math.max(tF - t, 0)
-      const stressRaw = scenario.C / (remaining + scenario.delta)
-      const stressModel = Math.min(Math.max(stressRaw, 0), STRESS_MODEL_CAP)
-
-      const baseFocus = Math.min(
-        Math.max(stressModel / Math.max(xp, EPSILON), 0),
-        1,
-      )
-      const distraction =
-        stressModel < xp
-          ? Math.max(dMax * (1 - stressModel / Math.max(xp, EPSILON)), 0)
-          : 0
-      const focus = Math.min(
-        Math.max(
-          baseFocus * Math.exp(-scenario.distraction_impact * distraction),
-          0,
-        ),
-        1,
-      )
-
-      const activation =
-        Math.pow(Math.max(stressModel, EPSILON), scenario.alpha) *
-        Math.exp(-scenario.beta * stressModel)
-      const fatigue = Math.exp(-lambdaC * (t - tStart))
-      const ratio = Math.min(Math.max((tF - t) / span, 0), 1)
-      const terminalGate = ratio * ratio * (3 - 2 * ratio)
-
-      const outputRaw =
-        scenario.A * phi * activation * fatigue * focus * terminalGate
-      const output = Number.isFinite(outputRaw) ? Math.max(outputRaw, 0) : 0
-
-      const dt = i === 0 ? 0 : t - previousT
-      cumulative += output * dt
-      previousT = t
-
-      series.push({
-        time: t,
-        time_n: timeN,
-        stress: Math.min(stressRaw, STRESS_DISPLAY_CAP),
-        output,
-        focus,
-        cumulative_output: cumulative,
-      })
-    }
-
-    return series
-  }, [scenario])
-
-  const liveTelemetry = useMemo(() => {
-    if (liveEquationTrajectory.length === 0) {
-      return null
-    }
-
-    const phi = scenario.iota * scenario.R_s * scenario.R_f * (1 + scenario.rho)
-    const lambdaC = scenario.lambda0 * Math.exp(-scenario.gamma * scenario.C)
-    const xp = scenario.X_p0 / Math.max(1 + scenario.sigma_task, EPSILON)
-    const dMax = scenario.D0 * (1 + scenario.eta * scenario.N_d)
-    const sStar = scenario.alpha / Math.max(scenario.beta, EPSILON)
-
-    const peakPoint = liveEquationTrajectory.reduce((best, point) =>
-      point.output > best.output ? point : best,
-    )
-    const finalPoint = liveEquationTrajectory[liveEquationTrajectory.length - 1]
-
-    return {
-      phi,
-      lambdaC,
-      xp,
-      dMax,
-      sStar,
-      peakOutput: peakPoint.output,
-      peakTime: peakPoint.time_n,
-      omegaFinal: finalPoint?.cumulative_output ?? 0,
-      focusFinal: finalPoint?.focus ?? 0,
-    }
-  }, [liveEquationTrajectory, scenario])
+  const livePreview = useMemo(() => computeLivePreview(scenario), [scenario])
+  const liveEquationTrajectory = livePreview.trajectory
+  const liveTelemetry = livePreview.telemetry
 
   const runError = (error: unknown) => {
     if (error instanceof ApiError) {
@@ -603,13 +251,20 @@ function App() {
   }
 
   const runSensitivity = async () => {
-    const parameters = sensitivityParameters
-      .split(',')
-      .map((token) => token.trim())
-      .filter(Boolean)
+    const { resolved: parameters, unknown } =
+      parsePublicParameterInput(sensitivityParameters)
 
     if (parameters.length === 0) {
-      setErrorMessage('Provide at least one sensitivity parameter.')
+      setErrorMessage(
+        'Provide at least one valid parameter (public name or technical key).',
+      )
+      return
+    }
+
+    if (unknown.length > 0) {
+      setErrorMessage(
+        `Unknown sensitivity parameter(s): ${unknown.join(', ')}.`,
+      )
       return
     }
 
@@ -671,7 +326,7 @@ function App() {
     const index = interventions.length + 1
     setInterventions((previous) => [
       ...previous,
-      interventionTemplate(scenario, `Intervention ${index}`, {
+      createIntervention(scenario, `Intervention ${index}`, {
         C: scenario.C,
         t_f: scenario.t_f,
         sigma_task: scenario.sigma_task,
@@ -735,7 +390,7 @@ function App() {
       if (parsed.runs !== undefined) {
         const nextRuns = Number(parsed.runs)
         if (Number.isFinite(nextRuns)) {
-          setRuns(Math.max(1, Math.round(nextRuns)))
+          setRuns(clampRuns(nextRuns))
         }
       }
 
@@ -770,10 +425,10 @@ function App() {
             const name =
               typeof record.name === 'string' && record.name.trim() !== ''
                 ? record.name
-                : `Intervention ${Math.random().toString(16).slice(2, 6)}`
+                : `Intervention ${createStableId().slice(-4)}`
 
             return {
-              id: `${Date.now()}-${Math.random().toString(16).slice(2)}`,
+              id: createStableId(),
               name,
               scenario: sanitizeScenario(record.scenario),
             }
@@ -915,7 +570,7 @@ function App() {
               <h3>Live equation graph: P(t), S(t), and F(t)</h3>
               <p className="equation-text">
                 P(t) = A * Phi * S(t)^alpha * exp(-beta*S(t)) * exp(-lambda(c)*t)
-                * F(S) * gate(t), with S(t) = C / (t_f - t + delta)
+                * F(S) * gate(t), with S(t) = (C * psi) / (t_f - t + delta)
               </p>
               <ResponsiveContainer width="100%" height={360}>
                 <LineChart data={liveEquationTrajectory}>
@@ -1034,7 +689,8 @@ function App() {
                   value={runs}
                   step={1}
                   min={1}
-                  onChange={(value) => setRuns(Math.max(1, Math.round(value)))}
+                  max={500}
+                  onChange={(value) => setRuns(clampRuns(value))}
                 />
               </label>
 
@@ -1071,7 +727,11 @@ function App() {
                         className="quick-slider-row"
                         key={`${group.title}-${String(slider.key)}`}
                       >
-                        <span className="quick-slider-label">{slider.label}</span>
+                        <InfoTooltip
+                          className="quick-slider-label"
+                          label={slider.label}
+                          description={getPublicParameterDescription(slider.key)}
+                        />
                         <input
                           type="range"
                           min={slider.min}
@@ -1127,6 +787,12 @@ function App() {
                   </span>
                   <span className="kpi-chip">
                     F_final = {formatNumber(liveTelemetry.focusFinal)}
+                  </span>
+                  <span className="kpi-chip">
+                    psi = {formatNumber(liveTelemetry.psi)}
+                  </span>
+                  <span className="kpi-chip">
+                    p = {formatNumber(liveTelemetry.probability)}
                   </span>
                 </div>
 
@@ -1296,7 +962,10 @@ function App() {
                     <div className="field-grid">
                       {group.fields.map((field) => (
                         <label className="field-cell" key={String(field.key)}>
-                          <span>{field.label}</span>
+                          <InfoTooltip
+                            label={field.label}
+                            description={getPublicParameterDescription(field.key)}
+                          />
                           <NumberInput
                             value={scenario[field.key]}
                             step={field.step}
@@ -1357,6 +1026,7 @@ function App() {
                     onChange={(event) =>
                       setSensitivityParameters(event.currentTarget.value)
                     }
+                    placeholder="e.g. consequence pressure, stress activation sensitivity"
                   />
                 </label>
 
@@ -1401,7 +1071,14 @@ function App() {
                     <tbody>
                       {sensitivity.items.map((item) => (
                         <tr key={item.parameter}>
-                          <td>{item.parameter}</td>
+                          <td>
+                            <InfoTooltip
+                              label={getPublicParameterLabelWithKey(item.parameter)}
+                              description={getPublicParameterDescriptionFromKey(
+                                item.parameter,
+                              )}
+                            />
+                          </td>
                           <td>{formatNumber(item.base_value)}</td>
                           <td>{formatNumber(item.metric_plus)}</td>
                           <td>{formatNumber(item.metric_minus)}</td>
@@ -1472,7 +1149,10 @@ function App() {
 
                     <div className="field-grid field-grid-compact">
                       <label className="field-cell">
-                        <span>C</span>
+                        <InfoTooltip
+                          label="Consequence pressure"
+                          description={getPublicParameterDescription('C')}
+                        />
                         <NumberInput
                           value={item.scenario.C}
                           step={0.1}
@@ -1483,7 +1163,10 @@ function App() {
                         />
                       </label>
                       <label className="field-cell">
-                        <span>t_f</span>
+                        <InfoTooltip
+                          label="Deadline time"
+                          description={getPublicParameterDescription('t_f')}
+                        />
                         <NumberInput
                           value={item.scenario.t_f}
                           step={0.01}
@@ -1493,7 +1176,10 @@ function App() {
                         />
                       </label>
                       <label className="field-cell">
-                        <span>sigma_task</span>
+                        <InfoTooltip
+                          label="Task stimulation level"
+                          description={getPublicParameterDescription('sigma_task')}
+                        />
                         <NumberInput
                           value={item.scenario.sigma_task}
                           step={0.05}
@@ -1504,7 +1190,10 @@ function App() {
                         />
                       </label>
                       <label className="field-cell">
-                        <span>iota</span>
+                        <InfoTooltip
+                          label="Identity alignment"
+                          description={getPublicParameterDescription('iota')}
+                        />
                         <NumberInput
                           value={item.scenario.iota}
                           step={0.05}
@@ -1516,7 +1205,10 @@ function App() {
                         />
                       </label>
                       <label className="field-cell">
-                        <span>rho</span>
+                        <InfoTooltip
+                          label="Irreversibility level"
+                          description={getPublicParameterDescription('rho')}
+                        />
                         <NumberInput
                           value={item.scenario.rho}
                           step={0.05}

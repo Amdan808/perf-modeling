@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 name = "performance-model"
 version = "0.1.0"
 description = "Executable performance-under-pressure model backend MVP"
-readme = "performance_model.md"
+readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
   "fastapi>=0.115,<1.0",
