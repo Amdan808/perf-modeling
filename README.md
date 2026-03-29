@@ -1,4 +1,4 @@
-# Performance Under Pressure — Executable Model
+# Performance Under Pressure — Executable Mathematical Model
 
 This project started as an observation linking psychology and mathematics:
 performance can become sharper and more reliable under high-stakes, time-pressured conditions.
@@ -15,13 +15,13 @@ The model formalizes a self-observed pattern:
 
 The practical goal is intervention design: engineering conditions that trigger peak performance earlier, rather than waiting for last-minute pressure.
 
-## Non-technical summary (60 seconds)
+## Non-technical summary
 
 Think of performance like an engine controlled by pressure:
 
-- Too little pressure: slow start and drift.
-- Enough pressure: focus locks in and output rises.
-- Too much pressure: overload risk and inconsistency increase.
+- Too little pressure : slow start and drift, you still have time don't worry 😎.
+- Enough pressure : normies lock in and output rises, weirdos are chilling 🤓.
+- Too much pressure : overload risk but performance ignites, especially for weirdos like myself 🙀.
 
 This project simulates that curve over time, then estimates how likely the total work is to clear a success threshold.
 
